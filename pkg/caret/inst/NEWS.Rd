@@ -4,6 +4,14 @@
 
 \section{Changes in version 6.0-XX}{
 	\itemize{
+		\item A bug was fixed related to imputation when the formula method is used with \code{train}
+		\item Reynald Lescarbeau refactored \code{findCorrelation} to make it faster. 
+		\item The old \code{drop = FALSE} bug was fixed in \code{getTrainPerf}
+	}
+}
+
+\section{Changes in version 6.0-37}{
+	\itemize{
 		\item Brenton Kenkel added ordered logistic or probit regression to \code{train} using \code{method = "polr"} from \cpkg{MASS} 
 		\item \code{LPH07_1} now encodes the noise variables as binary
 		\item Both \code{rfe} and \code{sbf} get arguments for \code{indexOut} for their control functions. 
@@ -14,7 +22,9 @@
 		\item A bug using \code{gbm} with Poisson data was fixed (thanks to user eriklampa)
 		\item \code{sbfControl} now has a \code{multivariate} option where all the predictors are exposed to the scoring function at once.
 		\item A function \code{compare_models} was added that is a simple comparison of models via \code{diff.resamples)}. 
-		\imte The row names for the \code{variables} component of \code{rfe} objects were simplified.  
+		\item The row names for the \code{variables} component of \code{rfe} objects were simplified.  
+		\item Philipp Bergmeir found a bug that was fixed where \code{bag} would not run in parallel. 
+		\item \code{predictionBounds} was not implemented during resampling.
 	}
 }
 
@@ -1576,8 +1586,8 @@ scatter plots are models or metrics.
 \section{Changes in version 4.50}{
 \itemize{ 
 
-\item Added \code{\link{dotplot.resamples}} plus acknowledgements to Hothorn et al 
-(2005) and Eugster et al (2008)
+\item Added \code{\link{dotplot.resamples}} plus acknowledgements to Hothorn et al.
+(2005) and Eugster et al. (2008)
 
  }
 }

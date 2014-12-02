@@ -127,7 +127,7 @@ prettySeq <- function(x) paste("Resample", gsub(" ", "0", format(seq(along = x))
 
 ipredStats <- function(x)
 {
-  requireNamespace("e1071", quietly = TRUE)
+  requireNamespaceQuietStop("e1071")
   ## error check
   if(is.null(x$X)) stop("to get OOB stats, keepX must be TRUE when calling the bagging function")
   
@@ -136,7 +136,7 @@ ipredStats <- function(x)
       holdY <- y[-object$bindx]
       if(is.factor(y))
         {
-          requireNamespace("e1071", quietly = TRUE)
+          requireNamespaceQuietStop("e1071")
           tmp <- predict(object$btree, x[-object$bindx,], type = "class")
           tmp <- factor(as.character(tmp), levels = levels(y))
           out <- c(
@@ -167,7 +167,7 @@ rfStats <- function(x)
                 x$type,
                 regression =   c(sqrt(max(x$mse[length(x$mse)], 0)), x$rsq[length(x$rsq)]),
                 classification = {
-                  requireNamespace("e1071", quietly = TRUE)
+                  requireNamespaceQuietStop("e1071")
                   c(
                     1 - x$err.rate[x$ntree, "OOB"],
                     e1071::classAgreement(x$confusion[,-dim(x$confusion)[2]])[["kappa"]])
@@ -210,7 +210,7 @@ defaultSummary <- function(data, lev = NULL, model = NULL)
 
 twoClassSummary <- function (data, lev = NULL, model = NULL) 
 {
-  require(pROC)
+  requireNamespaceQuietStop('pROC')
   if (!all(levels(data[, "pred"]) == levels(data[, "obs"]))) 
     stop("levels of observed and predicted data do not match")
   rocObject <- try(pROC::roc(data$obs, data[, lev[1]]), silent = TRUE)
@@ -361,3 +361,21 @@ scrubCall <- function(x)
     for(i in items) if(nchar(as.character(x[i])) > 100) x[i] <- "scrubbed"
     x
   }
+
+class2ind <- function(x, drop2nd = FALSE) {
+	if(!is.factor(x)) stop("'x' should be a factor")
+	y <- model.matrix(~ x - 1) 
+	colnames(y) <- gsub("^x", "", colnames(y))
+	attributes(y)$assign <- NULL
+	attributes(y)$contrasts <- NULL
+	if(length(levels(x)) == 2 & drop2nd) {
+		y <- y[,1]
+	}
+	y
+}
+
+requireNamespaceQuietStop <- function(package)
+{
+    if (!requireNamespace(package, quietly = TRUE))
+        stop(paste('package',package,'is required'))
+}
