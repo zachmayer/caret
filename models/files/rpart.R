@@ -49,7 +49,7 @@ modelInfo <- list(label = "CART",
                     
                     out <- do.call("rpart", modelArgs)
                     
-                    if(last) out <- prune.rpart(modelFit, cp = param$cp)
+                    if(last) out <- prune.rpart(out, cp = param$cp)
                     out           
                     },
                   predict = function(modelFit, newdata, submodels = NULL) {                  
@@ -145,6 +145,13 @@ modelInfo <- list(label = "CART",
                     out2 <- data.frame(Overall = out$x)
                     rownames(out2) <- out$Variable
                     out2  
+                  },
+                  trim = function(x) {
+                    x$call <- list(na.action = (x$call)$na.action)
+                    x$x <- NULL
+                    x$y <- NULL
+                    x$where <- NULL
+                    x
                   },
                   tags = c("Tree-Based Model", "Implicit Feature Selection"),
                   sort = function(x) x[order(x[,1], decreasing = TRUE),])

@@ -15,3 +15,17 @@ pkg/caret/DESCRIPTION~
 .Rproj.user
 
 pkg/caret/inst/NEWS.Rd~
+
+pkg/caret/src/symbols.rds
+
+html/featureselection.html
+
+html/makeHTML.Rout
+
+html/similarity.html
+
+html/tag_data.csv
+
+RegressionTests/move_files.Rout
+
+RegressionTests/.RData

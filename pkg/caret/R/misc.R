@@ -137,14 +137,14 @@ ipredStats <- function(x)
       if(is.factor(y))
         {
           requireNamespaceQuietStop("e1071")
-          tmp <- predict(object$btree, x[-object$bindx,], type = "class")
+          tmp <- predict(object$btree, x[-object$bindx,,drop = FALSE], type = "class")
           tmp <- factor(as.character(tmp), levels = levels(y))
           out <- c(
                    mean(holdY == tmp),
                    e1071::classAgreement(table(holdY, tmp))$kappa)
           
         } else {
-          tmp <- predict(object$btree, x[-object$bindx,])
+          tmp <- predict(object$btree, x[-object$bindx,,drop = FALSE])
 
           out <- c(
                    sqrt(mean((tmp - holdY)^2, na.rm = TRUE)),
@@ -200,27 +200,6 @@ R2 <- function(pred, obs, formula = "corr", na.rm = FALSE)
 
 
 RMSE <- function(pred, obs, na.rm = FALSE) sqrt(mean((pred - obs)^2, na.rm = na.rm))
-
-
-defaultSummary <- function(data, lev = NULL, model = NULL)
-  {
-    if(is.character(data$obs)) data$obs <- factor(data$obs, levels = lev)
-    postResample(data[,"pred"], data[,"obs"])
-  }
-
-twoClassSummary <- function (data, lev = NULL, model = NULL) 
-{
-  requireNamespaceQuietStop('pROC')
-  if (!all(levels(data[, "pred"]) == levels(data[, "obs"]))) 
-    stop("levels of observed and predicted data do not match")
-  rocObject <- try(pROC::roc(data$obs, data[, lev[1]]), silent = TRUE)
-  rocAUC <- if(class(rocObject)[1] == "try-error") NA else rocObject$auc
-  out <- c(rocAUC,
-           sensitivity(data[, "pred"], data[, "obs"], lev[1]),
-           specificity(data[, "pred"], data[, "obs"], lev[2]))
-  names(out) <- c("ROC", "Sens", "Spec")
-  out
-}
 
 partRuleSummary <- function(x)
   {
@@ -374,8 +353,40 @@ class2ind <- function(x, drop2nd = FALSE) {
 	y
 }
 
-requireNamespaceQuietStop <- function(package)
-{
+requireNamespaceQuietStop <- function(package) {
     if (!requireNamespace(package, quietly = TRUE))
         stop(paste('package',package,'is required'))
 }
+
+get_resample_perf <- function (x, ...) UseMethod("get_resample_perf")
+
+get_resample_perf.train <- function(x) {
+  if(x$control$returnResamp == "none")
+    stop("use returnResamp == 'none' in trainControl()")
+  out <- merge(x$resample, x$bestTune)
+  out[, c(x$perfNames, "Resample")]
+}
+
+get_resample_perf.rfe <- function(x) {
+  if(x$control$returnResamp == "none")
+    stop("use returnResamp == 'none' in trainControl()")
+  out <- subset(x$resample, Variables == x$bestSubset) 
+  out[, c(x$perfNames, "Resample")]
+}
+
+get_resample_perf.sbf <- function(x) {
+  if(x$control$returnResamp == "none")
+    stop("use returnResamp == 'none' in trainControl()")
+  x$resample
+}
+
+get_resample_perf.safs <- function(x) {
+  out <- subset(x$external, Iter == x$optIter)
+  out[, !(names(out) %in% "Iter")]
+}
+
+get_resample_perf.gafs <- function(x) {
+  out <- subset(x$external, Iter == x$optIter)
+  out[, !(names(out) %in% "Iter")]
+}
+

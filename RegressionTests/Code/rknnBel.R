@@ -19,7 +19,7 @@ set.seed(849)
 test_class_cv_model <- train(trainX, trainY, 
                              method = "rknnBel", 
                              trControl = cctrl1, 
-                             tuneGrid = grid,
+                             tuneLength = 2,
                              preProc = c("center", "scale"), 
                              seed = 135)
 
@@ -27,7 +27,7 @@ set.seed(849)
 test_class_cv_form <- train(Class ~ ., data = training, 
                             method = "rknnBel", 
                             trControl = cctrl1, 
-                            tuneGrid = grid,
+                            tuneLength = 2,
                             preProc = c("center", "scale"), 
                             seed = 135)
 test_class_pred <- predict(test_class_cv_model, testing[, -ncol(testing)])
@@ -37,7 +37,7 @@ set.seed(849)
 test_class_loo_model <- train(trainX, trainY, 
                               method = "rknnBel", 
                               trControl = cctrl2, 
-                              tuneGrid = grid,
+                              tuneLength = 2,
                               preProc = c("center", "scale"), 
                               seed = 135)
 
